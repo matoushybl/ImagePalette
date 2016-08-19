@@ -46,38 +46,34 @@ extension UIImage {
 		let bitmapBytesPerRow = (pixelsWide * 4)
 		let bitmapByteCount = (bitmapBytesPerRow * pixelsHigh)
 
-		if let colorSpace = CGColorSpaceCreateDeviceRGB() {
-			let bitmapData = malloc(bitmapByteCount)
-			defer { free(bitmapData) }
+		let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapData = malloc(bitmapByteCount)
+        defer { free(bitmapData) }
 
-			if let context = CGBitmapContextCreate(bitmapData, pixelsWide, pixelsHigh, 8, bitmapBytesPerRow, colorSpace, CGImageAlphaInfo.PremultipliedFirst.rawValue) {
-				CGContextDrawImage(context, CGRectMake(0.0, 0.0, CGFloat(pixelsWide), CGFloat(pixelsHigh)), image)
+        if let context = CGBitmapContextCreate(bitmapData, pixelsWide, pixelsHigh, 8, bitmapBytesPerRow, colorSpace, CGImageAlphaInfo.PremultipliedFirst.rawValue) {
+            CGContextDrawImage(context, CGRectMake(0.0, 0.0, CGFloat(pixelsWide), CGFloat(pixelsHigh)), image)
 
-				let unconstrainedData = CGBitmapContextGetData(context)
-				let data = UnsafePointer<UInt8>(unconstrainedData)
-				var pixels = Array<Int64>()
+            let unconstrainedData = CGBitmapContextGetData(context)
+            let data = UnsafePointer<UInt8>(unconstrainedData)
+            var pixels = Array<Int64>()
 
-                for x in (0..<pixelsWide) {
-					for y in (0..<pixelsHigh) {
-						let pixelInfo = ((pixelsWide * y) + x) * 4
+            for x in (0..<pixelsWide) {
+                for y in (0..<pixelsHigh) {
+                    let pixelInfo = ((pixelsWide * y) + x) * 4
 
-						let alpha = Int64(data[pixelInfo])
-						let red = Int64(data[pixelInfo + 1])
-						let green = Int64(data[pixelInfo + 2])
-						let blue = Int64(data[pixelInfo + 3])
+                    let alpha = Int64(data[pixelInfo])
+                    let red = Int64(data[pixelInfo + 1])
+                    let green = Int64(data[pixelInfo + 2])
+                    let blue = Int64(data[pixelInfo + 3])
 
-						pixels.append(HexColor.fromARGB(alpha, red: red, green: green, blue: blue))
-					}
-				}
+                    pixels.append(HexColor.fromARGB(alpha, red: red, green: green, blue: blue))
+                }
+            }
 
-				return pixels
-			} else {
-				fatalError("Unable to create bitmap context!")
-			}
-		} else {
-			fatalError("Unable to allocate color space")
-		}
-
+            return pixels
+        } else {
+            fatalError("Unable to create bitmap context!")
+        }
 	}
 
 }
